@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 
 @Component({
   selector: 'app-signal',
@@ -10,17 +10,22 @@ import { Component, signal } from '@angular/core';
 export class SignalComponent {
   actions = signal<string[]>([]);
   counter = signal(0);
+  doubCounter = computed(() => this.counter() * 2);
+
+  constructor() {
+    effect(() => console.log(this.counter()));
+  }
 
   increment() {
     // this.counter.update((oldValue) => oldValue + 1); /** takes a function */
     this.counter.set(this.counter() + 1); /** takes a new value */
-    this.actions.mutate((oldActions) => oldActions.push('INCREMENT'));
+    this.actions.mutate((oldActions) =>
+      oldActions.push('INCREMENT')
+    ); /** Mutation of arrays */
   }
 
   decrement() {
     this.counter.update((oldValue) => oldValue - 1);
-    this.actions.mutate((oldActions) =>
-      oldActions.push('DECREMENT')
-    ); /** Mutation for arrays */
+    this.actions.update((oldActions) => [...oldActions, 'DECREMENT']);
   }
 }
